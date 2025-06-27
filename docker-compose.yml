@@ -1,0 +1,23 @@
+services:
+  my_mariadb:
+    image: mariadb:latest
+    container_name: my_mariadb
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MARIADB_DATABASE}  # 데이터베이스 생성
+      - MYSQL_USER=${MARIADB_USER}          # 사용자 생성
+      - MYSQL_PASSWORD=${MARIADB_PASSWORD}  # 사용자 비밀번호
+    volumes:
+      - mariadbvolume:/var/lib/mysql
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+    restart: unless-stopped
+  
+volumes:
+  mariadbvolume:
